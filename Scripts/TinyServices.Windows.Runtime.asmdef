@@ -1,0 +1,16 @@
+{
+    "name": "TinyServices.Windows.Runtime",
+    "rootNamespace": "TinyServices.Windows",
+    "references": [
+        "GUID:52e8ae13a5f06b247affb7808bc8d3ff"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
