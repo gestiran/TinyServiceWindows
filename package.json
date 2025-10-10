@@ -20,6 +20,7 @@
     "url": "https://github.com/gestiran/TinyServiceWindows"
   },
   "dependencies": {
+    "com.unity.modules.uielements": "1.0.0",
     "com.ges.tinyreactive": "1.0.2"
   },
   "publishConfig": {

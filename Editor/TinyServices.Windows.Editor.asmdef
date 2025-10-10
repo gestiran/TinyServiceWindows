@@ -1,0 +1,19 @@
+{
+    "name": "TinyServices.Windows.Editor",
+    "rootNamespace": "TinyServices.Windows",
+    "references": [
+        "GUID:8be63ea3d4cdf1b4baa70190ecf64f2a",
+        "GUID:52e8ae13a5f06b247affb7808bc8d3ff"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
