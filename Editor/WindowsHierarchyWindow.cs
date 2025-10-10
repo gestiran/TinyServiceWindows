@@ -63,7 +63,7 @@ namespace TinyServices.Windows.Editor {
                     Type objectType = typeof(WindowBehavior);
                     
                     foreach (WindowBehavior window in WindowsService.ForeachVisible()) {
-                        ObjectField objectField = new ObjectField(window.ToString());
+                        ObjectField objectField = new ObjectField();
                         objectField.objectType = objectType;
                         objectField.value = window;
                         objectField.SetEnabled(false);
