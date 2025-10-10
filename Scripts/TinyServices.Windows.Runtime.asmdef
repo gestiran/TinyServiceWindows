@@ -2,7 +2,8 @@
     "name": "TinyServices.Windows.Runtime",
     "rootNamespace": "TinyServices.Windows",
     "references": [
-        "GUID:52e8ae13a5f06b247affb7808bc8d3ff"
+        "GUID:52e8ae13a5f06b247affb7808bc8d3ff",
+        "GUID:1d8cf7cb5006f57428fd819399459569"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -11,6 +12,12 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.ges.tinymvc",
+            "expression": "1.13.3",
+            "define": "TINY_MVC"
+        }
+    ],
     "noEngineReferences": false
 }

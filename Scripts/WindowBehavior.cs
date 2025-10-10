@@ -3,9 +3,19 @@
 
 using UnityEngine;
 
+#if TINY_MVC
+using TinyMVC.Loop;
+using TinyMVC.Views;
+using TinyReactive;
+#endif
+
 namespace TinyServices.Windows {
     [DisallowMultipleComponent]
+#if TINY_MVC
+    public abstract class WindowBehavior : View, IInit, IUnload {
+    #else
     public abstract class WindowBehavior : MonoBehaviour {
+    #endif
         public bool isVisible { get; private set; }
         
         public virtual void Init() { }
