@@ -19,7 +19,7 @@ namespace TinyServices.Windows {
         
         private static readonly Dictionary<Type, WindowBehavior> _instances;
         private static readonly Dictionary<Type, WindowBehavior> _all;
-        private static readonly Stack<WindowBehavior> _visible;
+        private static readonly List<WindowBehavior> _visible;
         
         static WindowsService() {
             onShow = new InputListener<WindowBehavior>();
@@ -27,7 +27,7 @@ namespace TinyServices.Windows {
             
             _instances = new Dictionary<Type, WindowBehavior>();
             _all = new Dictionary<Type, WindowBehavior>();
-            _visible = new Stack<WindowBehavior>();
+            _visible = new List<WindowBehavior>();
             
             WindowsDataBase dataBase = WindowsDataBase.LoadFromResources();
             
@@ -39,6 +39,10 @@ namespace TinyServices.Windows {
         public static void ChangeRoot(Canvas canvas) {
             root = canvas;
             _rootTransform = canvas.transform;
+            
+            foreach (WindowBehavior window in _visible) {
+                window.transform.SetParent(_rootTransform);
+            }
         }
         
         public static IEnumerable<WindowBehavior> ForeachVisible() {
@@ -57,7 +61,15 @@ namespace TinyServices.Windows {
             return false;
         }
         
-        public static bool TryGetTop(out WindowBehavior window) => _visible.TryPeek(out window);
+        public static bool TryGetTop(out WindowBehavior window) {
+            if (_visible.Count > 0) {
+                window = _visible[^1];
+                return true;
+            }
+            
+            window = null;
+            return false;
+        }
         
         public static T Show<T>() where T : WindowBehavior => Show<T>(_rootTransform);
         
@@ -66,47 +78,60 @@ namespace TinyServices.Windows {
         public static T Show<T>(Transform parent) where T : WindowBehavior {
             Type type = typeof(T);
             
-            if (_instances.TryGetValue(type, out WindowBehavior instance)) {
-                if (instance != null) {
-                    instance.transform.SetParent(parent);
-                } else if (_all.TryGetValue(type, out WindowBehavior window) && window != null) {
-                    instance = UnityObject.Instantiate(window, parent);
-                    _instances[type] = instance;
+            if (_instances.TryGetValue(type, out WindowBehavior instance) == false) {
+                if (_all.TryGetValue(type, out WindowBehavior window)) {
+                    instance = Instantiate(window, parent);    
+                } else {
+                    return null;
                 }
-            } else if (_all.TryGetValue(type, out WindowBehavior window) && window != null) {
-                instance = UnityObject.Instantiate(window, parent);
+                
                 _instances.Add(type, instance);
             } else {
-                return null;
+                instance.transform.SetParent(parent);
             }
             
             instance.ShowInternal();
             onShow.Send(instance);
-            _visible.Push(instance);
+            _visible.Add(instance);
             return instance as T;
         }
         
         public static bool Hide() => Hide(out _);
         
         public static bool Hide(out WindowBehavior window) {
-            if (_visible.TryPop(out window) && window != null) {
+            if (_visible.Count > 0) {
+                int windowId = _visible.Count - 1;
+                
+                window = _visible[windowId];
+                _visible.RemoveAt(windowId);
+                
                 window.HideInternal();
                 onHide.Send(window);
                 return true;
             }
             
+            window = null;
             return false;
         }
         
         public static void HideAll() {
             foreach (WindowBehavior window in _visible) {
-                if (window != null) {
-                    window.Hide();
-                    onHide.Send(window);
-                }
+                window.Hide();
+                onHide.Send(window);
             }
             
             _visible.Clear();
+        }
+        
+        internal static void DestroyWindow(WindowBehavior window) {
+            _instances.Remove(window.GetType());
+            _visible.Remove(window);
+        }
+        
+        private static WindowBehavior Instantiate(WindowBehavior prefab, Transform parent) {
+            WindowBehavior instance = UnityObject.Instantiate(prefab, parent);
+            instance.Init();
+            return instance;
         }
     }
 }
