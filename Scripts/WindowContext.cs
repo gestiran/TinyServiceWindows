@@ -40,7 +40,7 @@ namespace TinyServices.Windows {
         [Obsolete("Can`t use without parameters", true)]
         protected void Connect<T>(T component) where T : WindowComponentBehaviour { }
         
-        protected void Connect(WindowComponentBehaviour[] components,  params IDependency[] dependencies) {
+        protected void Connect(WindowComponentBehaviour[] components, params IDependency[] dependencies) {
             foreach (WindowComponentBehaviour component in components) {
                 Connect(component, dependencies);
             }
@@ -201,5 +201,11 @@ namespace TinyServices.Windows {
     #endif
         
         internal abstract void Initialize();
+        
+    #if UNITY_EDITOR
+        
+        public virtual void Reset() => UnityEditor.EditorUtility.SetDirty(this);
+        
+    #endif
     }
 }
