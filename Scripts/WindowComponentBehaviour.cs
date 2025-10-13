@@ -1,26 +1,28 @@
+// Copyright (c) 2023 Derek Sliman
+// Licensed under the MIT License. See LICENSE.md for details.
+
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace TinyServices.Windows {
     [DisallowMultipleComponent]
-    public abstract class WindowComponentBehaviour : MonoBehaviour {
-        private void Awake() {
-            // Do Nothing
+    public abstract class WindowComponentBehaviour : WindowContext {
+        internal ConnectState connectState;
+        
+        internal enum ConnectState {
+            None,
+            Disconnected,
+            Connected
         }
         
-        private void Start() {
-            // Do Nothing
-        }
+        private void OnDestroy() { }
         
-        private void OnEnable() {
-            // Do Nothing
-        }
-        
-        private void OnDisable() {
-            // Do Nothing
-        }
-        
-        private void OnDestroy() {
-            // Do Nothing
+        internal override void Initialize() {
+            if (connectState != ConnectState.None) {
+                return;
+            }
+            
+            connections = new List<WindowComponentBehaviour>();
         }
     }
 }
