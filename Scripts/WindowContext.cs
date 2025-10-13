@@ -31,7 +31,7 @@ namespace TinyServices.Windows {
         
         protected void Connect(params WindowComponentBehaviour[] components) {
             foreach (WindowComponentBehaviour component in components) {
-                Connect(component);
+                Connect<WindowComponentBehaviour>(component);
             }
         }
         
