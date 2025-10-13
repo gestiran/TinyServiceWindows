@@ -2,32 +2,38 @@
 // Licensed under the MIT License. See LICENSE.md for details.
 
 using UnityEngine;
-
-#if TINY_MVC
-using TinyMVC.Loop;
-using TinyMVC.Views;
 using TinyReactive;
-#endif
 
 namespace TinyServices.Windows {
     [DisallowMultipleComponent]
-#if TINY_MVC
-    public abstract class WindowBehavior : View, IInit, IUnload {
-    #else
     public abstract class WindowBehavior : MonoBehaviour {
-    #endif
         public bool isVisible { get; private set; }
-        
-        public virtual void Init() { }
-        
-        public virtual void Unload() { }
         
         public virtual void Show() => gameObject.SetActive(true);
         
         public virtual void Hide() => gameObject.SetActive(false);
         
+        private void Awake() {
+            // Do Nothing
+        }
+        
+        private void Start() {
+            // Do Nothing
+        }
+        
+        private void OnEnable() {
+            // Do Nothing
+        }
+        
+        private void OnDisable() {
+            // Do Nothing
+        }
+        
         private void OnDestroy() {
-            Unload();
+            if (this is IUnload unload) {
+                unload.Unload();
+            }
+            
             WindowsService.DestroyWindow(this);
         }
         

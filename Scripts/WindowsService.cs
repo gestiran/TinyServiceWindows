@@ -7,6 +7,12 @@ using TinyReactive.Fields;
 using UnityEngine;
 using UnityObject = UnityEngine.Object;
 
+#if TINY_MVC
+using TinyMVC.Loop;
+using TinyMVC.Dependencies;
+using TinyMVC.Dependencies.Extensions;
+#endif
+
 namespace TinyServices.Windows {
     public static class WindowsService {
         public static int visibleCount => _visible.Count;
@@ -71,16 +77,34 @@ namespace TinyServices.Windows {
             return false;
         }
         
-        public static T Show<T>() where T : WindowBehavior => Show<T>(_rootTransform);
+    #if TINY_MVC
         
-        public static T Show<T>(Canvas canvas) where T : WindowBehavior => Show<T>(canvas.transform);
+        public static T Show<T>(params IDependency[] dependencies) where T : WindowBehavior {
+            return Show<T>(_rootTransform, (window, transform) => Instantiate(window, transform, dependencies));
+        }
         
-        public static T Show<T>(Transform parent) where T : WindowBehavior {
+        public static T Show<T>(Canvas canvas, params IDependency[] dependencies) where T : WindowBehavior {
+            return Show<T>(canvas.transform, (window, transform) => Instantiate(window, transform, dependencies));
+        }
+        
+        public static T Show<T>(Transform parent, params IDependency[] dependencies) where T : WindowBehavior {
+            return Show<T>(parent, (window, transform) => Instantiate(window, transform, dependencies));
+        }
+        
+    #endif
+        
+        public static T Show<T>() where T : WindowBehavior => Show<T>(_rootTransform, Instantiate);
+        
+        public static T Show<T>(Canvas canvas) where T : WindowBehavior => Show<T>(canvas.transform, Instantiate);
+        
+        public static T Show<T>(Transform parent) where T : WindowBehavior => Show<T>(parent, Instantiate);
+        
+        private static T Show<T>(Transform parent, Func<WindowBehavior, Transform, WindowBehavior> instantiate) where T : WindowBehavior {
             Type type = typeof(T);
             
             if (_instances.TryGetValue(type, out WindowBehavior instance) == false) {
                 if (_all.TryGetValue(type, out WindowBehavior window)) {
-                    instance = Instantiate(window, parent);    
+                    instance = instantiate(window, parent);
                 } else {
                     return null;
                 }
@@ -128,10 +152,30 @@ namespace TinyServices.Windows {
             _visible.Remove(window);
         }
         
-        private static WindowBehavior Instantiate(WindowBehavior prefab, Transform parent) {
-            WindowBehavior instance = UnityObject.Instantiate(prefab, parent);
-            instance.Init();
+        private static WindowBehavior Instantiate(WindowBehavior prefab, Transform parent) => UnityObject.Instantiate(prefab, parent);
+        
+    #if TINY_MVC
+        private static WindowBehavior Instantiate(WindowBehavior prefab, Transform parent, IDependency[] dependencies) {
+            WindowBehavior instance = Instantiate(prefab, parent);
+            
+            if (instance is IInit init) {
+                init.Init();
+            }
+            
+            if (instance is IApplyResolving applyResolving) {
+                if (dependencies != null) {
+                    applyResolving.ApplyResolving(dependencies);
+                } else {
+                    applyResolving.ApplyResolving();
+                }
+            }
+            
+            if (instance is IBeginPlay beginPlay) {
+                beginPlay.BeginPlay();
+            }
+            
             return instance;
         }
+    #endif
     }
 }
