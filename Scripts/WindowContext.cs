@@ -52,6 +52,8 @@ namespace TinyServices.Windows {
                 return component;
             }
             
+            component.Initialize();
+            
             if (component is IInit init) {
                 init.Init();
             }
@@ -64,7 +66,6 @@ namespace TinyServices.Windows {
                 beginPlay.BeginPlay();
             }
             
-            component.Initialize();
             component.connectState = WindowComponentBehaviour.ConnectState.Connected;
             connections.Add(component);
             return component;
@@ -77,6 +78,8 @@ namespace TinyServices.Windows {
                 Debug.LogError($"Invalid Connection - {GetType().Name} obj {name} and component {component.GetType().Name} obj {component.name}", component);
                 return component;
             }
+            
+            component.Initialize();
             
         #if TINY_MVC
             
@@ -94,7 +97,6 @@ namespace TinyServices.Windows {
             
         #endif
             
-            component.Initialize();
             component.connectState = WindowComponentBehaviour.ConnectState.Connected;
             connections.Add(component);
             return component;
