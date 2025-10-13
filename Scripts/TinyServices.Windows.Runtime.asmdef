@@ -15,7 +15,7 @@
     "versionDefines": [
         {
             "name": "com.ges.tinymvc",
-            "expression": "1.13.3",
+            "expression": "1.13.5",
             "define": "TINY_MVC"
         }
     ],

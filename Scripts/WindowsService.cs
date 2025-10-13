@@ -152,8 +152,6 @@ namespace TinyServices.Windows {
             _visible.Remove(window);
         }
         
-        private static WindowBehavior Instantiate(WindowBehavior prefab, Transform parent) => UnityObject.Instantiate(prefab, parent);
-        
     #if TINY_MVC
         private static WindowBehavior Instantiate(WindowBehavior prefab, Transform parent, IDependency[] dependencies) {
             WindowBehavior instance = Instantiate(prefab, parent);
@@ -177,5 +175,11 @@ namespace TinyServices.Windows {
             return instance;
         }
     #endif
+        
+        private static WindowBehavior Instantiate(WindowBehavior prefab, Transform parent) {
+            WindowBehavior instance = UnityObject.Instantiate(prefab, parent);
+            instance.Initialize();
+            return instance;
+        }
     }
 }
