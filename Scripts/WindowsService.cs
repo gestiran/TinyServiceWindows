@@ -77,6 +77,18 @@ namespace TinyServices.Windows {
             return false;
         }
         
+        public static bool TryGetVisible<T>(out T window) where T : WindowBehavior {
+            foreach (WindowBehavior other in _visible) {
+                if (other is T target) {
+                    window = target;
+                    return true;
+                }
+            }
+            
+            window = null;
+            return false;
+        }
+        
     #if TINY_MVC
         
         public static T Show<T>(params IDependency[] dependencies) where T : WindowBehavior {
