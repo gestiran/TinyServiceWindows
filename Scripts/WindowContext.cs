@@ -38,9 +38,15 @@ namespace TinyServices.Windows {
     #if TINY_MVC
         
         [Obsolete("Can`t use without parameters", true)]
-        protected void Connect<T>(T component) where T : WindowComponentBehaviour, IApplyResolving { }
+        protected void Connect<T>(T component) where T : WindowComponentBehaviour { }
         
-        protected T Connect<T>(T component, params IDependency[] dependencies) where T : WindowComponentBehaviour, IApplyResolving {
+        protected void Connect(WindowComponentBehaviour[] components,  params IDependency[] dependencies) {
+            foreach (WindowComponentBehaviour component in components) {
+                Connect(component, dependencies);
+            }
+        }
+        
+        protected T Connect<T>(T component, params IDependency[] dependencies) where T : WindowComponentBehaviour {
             if (component.connectState == WindowComponentBehaviour.ConnectState.Connected) {
                 Debug.LogError($"Invalid Connection - {GetType().Name} obj {name} and component {component.GetType().Name} obj {component.name}", component);
                 return component;
