@@ -154,18 +154,15 @@ namespace TinyServices.Windows {
         
     #if TINY_MVC
         private static WindowBehavior Instantiate(WindowBehavior prefab, Transform parent, IDependency[] dependencies) {
-            WindowBehavior instance = Instantiate(prefab, parent);
+            WindowBehavior instance = UnityObject.Instantiate(prefab, parent);
+            instance.Initialize();
             
             if (instance is IInit init) {
                 init.Init();
             }
             
             if (instance is IApplyResolving applyResolving) {
-                if (dependencies != null) {
-                    applyResolving.ApplyResolving(dependencies);
-                } else {
-                    applyResolving.ApplyResolving();
-                }
+                applyResolving.ApplyResolving(dependencies);
             }
             
             if (instance is IBeginPlay beginPlay) {
@@ -179,6 +176,23 @@ namespace TinyServices.Windows {
         private static WindowBehavior Instantiate(WindowBehavior prefab, Transform parent) {
             WindowBehavior instance = UnityObject.Instantiate(prefab, parent);
             instance.Initialize();
+            
+        #if TINY_MVC
+            
+            if (instance is IInit init) {
+                init.Init();
+            }
+            
+            if (instance is IApplyResolving applyResolving) {
+                applyResolving.ApplyResolving();
+            }
+            
+            if (instance is IBeginPlay beginPlay) {
+                beginPlay.BeginPlay();
+            }
+            
+        #endif
+            
             return instance;
         }
     }
