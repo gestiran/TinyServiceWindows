@@ -12,14 +12,12 @@ namespace TinyServices.Windows.Editor {
         private static void OpenWindow() => GetWindow<WindowsHierarchyWindow>("Windows");
         
         private void OnBecameVisible() {
-            WindowsService.onShow.AddListener(UpdateWindowsList);
-            WindowsService.onHide.AddListener(UpdateWindowsList);
+            WindowsService.onUpdateVisible.AddListener(UpdateWindowsList);
             EditorApplication.playModeStateChanged += PlayModeChange;
         }
         
         private void OnBecameInvisible() {
-            WindowsService.onShow.RemoveListener(UpdateWindowsList);
-            WindowsService.onHide.RemoveListener(UpdateWindowsList);
+            WindowsService.onUpdateVisible.RemoveListener(UpdateWindowsList);
             EditorApplication.playModeStateChanged -= PlayModeChange;
         }
         

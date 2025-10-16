@@ -22,6 +22,7 @@ namespace TinyServices.Windows {
         
         public static readonly InputListener<WindowBehavior> onShow;
         public static readonly InputListener<WindowBehavior> onHide;
+        public static readonly InputListener onUpdateVisible;
         
         private static readonly Dictionary<Type, WindowBehavior> _instances;
         private static readonly Dictionary<Type, WindowBehavior> _all;
@@ -30,6 +31,7 @@ namespace TinyServices.Windows {
         static WindowsService() {
             onShow = new InputListener<WindowBehavior>();
             onHide = new InputListener<WindowBehavior>();
+            onUpdateVisible = new InputListener();
             
             _instances = new Dictionary<Type, WindowBehavior>();
             _all = new Dictionary<Type, WindowBehavior>();
@@ -129,6 +131,7 @@ namespace TinyServices.Windows {
             instance.ShowInternal();
             onShow.Send(instance);
             _visible.Add(instance);
+            onUpdateVisible.Send();
             return instance as T;
         }
         
@@ -140,7 +143,7 @@ namespace TinyServices.Windows {
                 
                 window = _visible[windowId];
                 _visible.RemoveAt(windowId);
-                
+                onUpdateVisible.Send();
                 window.HideInternal();
                 onHide.Send(window);
                 return true;
@@ -157,11 +160,13 @@ namespace TinyServices.Windows {
             }
             
             _visible.Clear();
+            onUpdateVisible.Send();
         }
         
         internal static void DestroyWindow(WindowBehavior window) {
             _instances.Remove(window.GetType());
             _visible.Remove(window);
+            onUpdateVisible.Send();
         }
         
     #if TINY_MVC

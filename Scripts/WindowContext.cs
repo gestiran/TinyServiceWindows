@@ -45,7 +45,6 @@ namespace TinyServices.Windows {
         
         protected T Connect<T>(T component, params IDependency[] dependencies) where T : WindowComponentBehaviour {
             if (component.connectState == WindowComponentBehaviour.ConnectState.Connected) {
-                Debug.LogError($"Invalid Connection - {GetType().Name} obj {name} and component {component.GetType().Name} obj {component.name}", component);
                 return component;
             }
             
@@ -72,7 +71,6 @@ namespace TinyServices.Windows {
         
         protected T Connect<T>(T component) where T : WindowComponentBehaviour {
             if (component.connectState == WindowComponentBehaviour.ConnectState.Connected) {
-                Debug.LogError($"Invalid Connection - {GetType().Name} obj {name} and component {component.GetType().Name} obj {component.name}", component);
                 return component;
             }
             
@@ -126,8 +124,7 @@ namespace TinyServices.Windows {
         }
         
         protected bool Disconnect(WindowComponentBehaviour component) {
-            if (component.connectState == WindowComponentBehaviour.ConnectState.Connected) {
-                Debug.LogError($"Invalid Disconnection - {GetType().Name} obj {name} and component {component.GetType().Name} obj {component.name}", component);
+            if (component.connectState == WindowComponentBehaviour.ConnectState.Disconnected) {
                 return false;
             }
             

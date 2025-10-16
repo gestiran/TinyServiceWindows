@@ -2,10 +2,8 @@
 // Licensed under the MIT License. See LICENSE.md for details.
 
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace TinyServices.Windows {
-    [DisallowMultipleComponent]
     public abstract class WindowComponentBehaviour : WindowContext {
         internal ConnectState connectState;
         
