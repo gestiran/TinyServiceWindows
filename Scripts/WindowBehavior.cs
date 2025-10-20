@@ -8,6 +8,8 @@ using TinyReactive;
 namespace TinyServices.Windows {
     public abstract class WindowBehavior : WindowContext, IComparable<WindowBehavior> {
         public virtual int priority => 0;
+        public virtual bool ignoreAutoHide => false;
+        public virtual bool ignoreInput => false;
         public bool isVisible { get; private set; }
         
         public virtual void Show() => gameObject.SetActive(true);
@@ -35,6 +37,6 @@ namespace TinyServices.Windows {
             Hide();
         }
         
-        public int CompareTo(WindowBehavior other) => priority - other.priority; // (other) 10 - (main) 8 = -2
+        public int CompareTo(WindowBehavior other) => priority - other.priority;
     }
 }

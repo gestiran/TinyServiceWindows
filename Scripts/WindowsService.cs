@@ -70,8 +70,12 @@ namespace TinyServices.Windows {
         }
         
         public static bool TryGetTop(out WindowBehavior window) {
-            if (_visible.Count > 0) {
-                window = _visible[^1];
+            for (int windowId = _visible.Count - 1; windowId >= 0; windowId--) {
+                if (_visible[windowId].ignoreInput) {
+                    continue;
+                }
+                
+                window = _visible[windowId];
                 return true;
             }
             
@@ -142,13 +146,35 @@ namespace TinyServices.Windows {
             return instance as T;
         }
         
+        public static bool Hide<T>() where T : WindowBehavior => Hide<T>(out _);
+        
+        public static bool Hide<T>(out T window) where T : WindowBehavior {
+            for (int windowId = _visible.Count - 1; windowId >= 0; windowId--) {
+                if (_visible[windowId] is T target) {
+                    window = target;
+                    
+                    _visible.RemoveAt(windowId);
+                    onUpdateVisible.Send();
+                    window.HideInternal();
+                    onHide.Send(window);
+                    return true;
+                }
+            }
+            
+            window = null;
+            return false;
+        }
+        
         public static bool Hide() => Hide(out _);
         
         public static bool Hide(out WindowBehavior window) {
-            if (_visible.Count > 0) {
-                int windowId = _visible.Count - 1;
-                
+            for (int windowId = _visible.Count - 1; windowId >= 0; windowId--) {
                 window = _visible[windowId];
+                
+                if (window.ignoreAutoHide) {
+                    continue;
+                }
+                
                 _visible.RemoveAt(windowId);
                 onUpdateVisible.Send();
                 window.HideInternal();

@@ -3,9 +3,16 @@
 
 using UnityEngine;
 
+#if ODIN_INSPECTOR
+using Sirenix.OdinInspector;
+#endif
+
 namespace TinyServices.Windows {
     [CreateAssetMenu(fileName = "WindowsDataBase", menuName = "TinyServices/Windows/DataBase")]
     public sealed class WindowsDataBase : ScriptableObject {
+    #if ODIN_INSPECTOR
+        [field: Searchable, Required]
+    #endif
         [field: SerializeField]
         public WindowBehavior[] all;
         
