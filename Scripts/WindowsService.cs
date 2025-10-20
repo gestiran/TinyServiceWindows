@@ -131,6 +131,13 @@ namespace TinyServices.Windows {
             instance.ShowInternal();
             onShow.Send(instance);
             _visible.Add(instance);
+            
+            _visible.Sort();
+            
+            for (int orderId = 0; orderId < _visible.Count; orderId++) {
+                _visible[orderId].transform.SetSiblingIndex(orderId);
+            }
+            
             onUpdateVisible.Send();
             return instance as T;
         }
