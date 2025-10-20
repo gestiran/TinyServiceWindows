@@ -9,7 +9,7 @@ using Sirenix.OdinInspector;
 
 namespace TinyServices.Windows {
     [CreateAssetMenu(fileName = "WindowsDataBase", menuName = "TinyServices/Windows/DataBase")]
-    public sealed class WindowsDataBase : ScriptableObject {
+    public sealed class WindowsDataBase : ScriptableObject, ISelfValidator {
     #if ODIN_INSPECTOR
         [field: Searchable, Required]
     #endif
@@ -27,5 +27,21 @@ namespace TinyServices.Windows {
             
             return dataBase;
         }
+        
+    #if ODIN_INSPECTOR
+        public void Validate(SelfValidationResult result) {
+        #if UNITY_EDITOR
+            
+            for (int currentId = 0; currentId < all.Length; currentId++) {
+                for (int targetId = 0; targetId < all.Length; targetId++) {
+                    if (currentId != targetId && all[currentId].GetType() == all[targetId].GetType()) {
+                        result.AddError($"Invalid window type {all[currentId].GetType().Name}!");
+                    }
+                }
+            }
+            
+        #endif
+        }
+    #endif
     }
 }

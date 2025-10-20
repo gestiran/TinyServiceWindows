@@ -11,6 +11,7 @@ using UnityObject = UnityEngine.Object;
 using TinyMVC.Loop;
 using TinyMVC.Dependencies;
 using TinyMVC.Dependencies.Extensions;
+using TinyMVC.Views;
 #endif
 
 namespace TinyServices.Windows {
@@ -98,31 +99,32 @@ namespace TinyServices.Windows {
     #if TINY_MVC
         
         public static T Show<T>(params IDependency[] dependencies) where T : WindowBehavior {
-            return Show<T>(_rootTransform, (window, transform) => Instantiate(window, transform, dependencies));
+            return Show(typeof(T), _rootTransform, (window, transform) => Instantiate(window, transform, dependencies)) as T;
         }
         
         public static T Show<T>(Canvas canvas, params IDependency[] dependencies) where T : WindowBehavior {
-            return Show<T>(canvas.transform, (window, transform) => Instantiate(window, transform, dependencies));
+            return Show(typeof(T), canvas.transform, (window, transform) => Instantiate(window, transform, dependencies)) as T;
         }
         
         public static T Show<T>(Transform parent, params IDependency[] dependencies) where T : WindowBehavior {
-            return Show<T>(parent, (window, transform) => Instantiate(window, transform, dependencies));
+            return Show(typeof(T), parent, (window, transform) => Instantiate(window, transform, dependencies)) as T;
         }
         
     #endif
         
-        public static T Show<T>() where T : WindowBehavior => Show<T>(_rootTransform, Instantiate);
+        public static T Show<T>() where T : WindowBehavior => Show(typeof(T), _rootTransform, Instantiate) as T;
         
-        public static T Show<T>(Canvas canvas) where T : WindowBehavior => Show<T>(canvas.transform, Instantiate);
+        public static T Show<T>(Canvas canvas) where T : WindowBehavior => Show(typeof(T), canvas.transform, Instantiate) as T;
         
-        public static T Show<T>(Transform parent) where T : WindowBehavior => Show<T>(parent, Instantiate);
+        public static T Show<T>(Transform parent) where T : WindowBehavior => Show(typeof(T), parent, Instantiate) as T;
         
-        private static T Show<T>(Transform parent, Func<WindowBehavior, Transform, WindowBehavior> instantiate) where T : WindowBehavior {
-            Type type = typeof(T);
+        internal static WindowBehavior Show(Type type, Transform parent, Func<WindowBehavior, Transform, WindowBehavior> instantiate) {
+            bool isInitialized = false;
             
             if (_instances.TryGetValue(type, out WindowBehavior instance) == false) {
                 if (_all.TryGetValue(type, out WindowBehavior window)) {
                     instance = instantiate(window, parent);
+                    isInitialized = true;
                 } else {
                     return null;
                 }
@@ -131,6 +133,12 @@ namespace TinyServices.Windows {
             } else {
                 instance.transform.SetParent(parent);
             }
+            
+        #if TINY_MVC
+            if (isInitialized == false && instance is IUpdateConnection updateConnection) {
+                updateConnection.UpdateConnection();
+            }
+        #endif
             
             instance.ShowInternal();
             onShow.Send(instance);
@@ -143,7 +151,7 @@ namespace TinyServices.Windows {
             }
             
             onUpdateVisible.Send();
-            return instance as T;
+            return instance;
         }
         
         public static bool Hide<T>() where T : WindowBehavior => Hide<T>(out _);
@@ -223,7 +231,7 @@ namespace TinyServices.Windows {
         }
     #endif
         
-        private static WindowBehavior Instantiate(WindowBehavior prefab, Transform parent) {
+        internal static WindowBehavior Instantiate(WindowBehavior prefab, Transform parent) {
             WindowBehavior instance = UnityObject.Instantiate(prefab, parent);
             instance.Initialize();
             

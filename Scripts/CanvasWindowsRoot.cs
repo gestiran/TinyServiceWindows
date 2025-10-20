@@ -1,6 +1,7 @@
 // Copyright (c) 2023 Derek Sliman
 // Licensed under the MIT License. See LICENSE.md for details.
 
+using System.Collections;
 using UnityEngine;
 
 #if ODIN_INSPECTOR
@@ -10,19 +11,54 @@ using Sirenix.OdinInspector;
 namespace TinyServices.Windows {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Canvas))]
-    public class CanvasWindowsRoot : MonoBehaviour {
+    public sealed class CanvasWindowsRoot : MonoBehaviour {
+        public Canvas canvas => _thisCanvas;
+        
+    #if ODIN_INSPECTOR
+        [ValueDropdown("GetAllWindows"), Required]
+    #endif
+        [SerializeField]
+        private WindowBehavior[] _windows;
+        
     #if ODIN_INSPECTOR
         [BoxGroup("Generated"), Required, ReadOnly]
     #endif
         [SerializeField]
         private Canvas _thisCanvas;
         
-        protected virtual void Start() => WindowsService.ChangeRoot(_thisCanvas);
+        private void Start() {
+            WindowsService.ChangeRoot(_thisCanvas);
+            StartCoroutine(CreateWindows());
+        }
+        
+        private IEnumerator CreateWindows() {
+            yield return new WaitForEndOfFrame();
+            
+            foreach (WindowBehavior window in _windows) {
+                WindowsService.Show(window.GetType(), transform, WindowsService.Instantiate);
+            }
+        }
         
     #if UNITY_EDITOR
         
+    #if ODIN_INSPECTOR
+        
+        private ValueDropdownList<WindowBehavior> GetAllWindows() {
+            WindowsDataBase dataBase = WindowsDataBase.LoadFromResources();
+            
+            ValueDropdownList<WindowBehavior> windows = new ValueDropdownList<WindowBehavior>();
+            
+            foreach (WindowBehavior window in dataBase.all) {
+                windows.Add(window.GetType().Name, window);
+            }
+            
+            return windows;
+        }
+        
+    #endif
+        
         [ContextMenu("Soft Reset")]
-        protected virtual void Reset() {
+        private void Reset() {
             _thisCanvas = GetComponent<Canvas>();
             UnityEditor.EditorUtility.SetDirty(this);
         }
