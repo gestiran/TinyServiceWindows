@@ -25,6 +25,9 @@ namespace TinyServices.Windows {
             WindowsService.DestroyWindow(this);
         }
         
+        [Obsolete("Can`t use without parameters", true)]
+        protected void Disconnect() { }
+        
         internal override void Initialize() => connections = new List<WindowComponentBehaviour>();
         
         internal void ShowInternal() {

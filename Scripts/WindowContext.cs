@@ -26,6 +26,8 @@ namespace TinyServices.Windows {
         
         private void OnDisable() { }
         
+        protected IEnumerable<WindowComponentBehaviour> ForEachConnections() => connections;
+        
         [Obsolete("Can`t use without parameters", true)]
         protected void Connect() { }
         
@@ -99,8 +101,7 @@ namespace TinyServices.Windows {
             return component;
         }
         
-        [Obsolete("Can`t use without parameters", true)]
-        protected void Disconnect() { }
+        internal bool DisconnectSelf(WindowComponentBehaviour component) => component.root.Disconnect(component);
         
         protected void Disconnect(params WindowComponentBehaviour[] components) {
             foreach (WindowComponentBehaviour component in components) {

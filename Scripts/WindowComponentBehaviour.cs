@@ -24,5 +24,7 @@ namespace TinyServices.Windows {
             
             connections = new List<WindowComponentBehaviour>();
         }
+        
+        protected bool Disconnect() => root.DisconnectSelf(this);
     }
 }
