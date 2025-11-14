@@ -5,6 +5,8 @@ using System.Collections.Generic;
 
 namespace TinyServices.Windows {
     public abstract class WindowComponentBehaviour : WindowContext {
+        public WindowContext root { get; internal set; }
+        
         internal ConnectState connectState;
         
         internal enum ConnectState {

@@ -62,6 +62,7 @@ namespace TinyServices.Windows {
                 beginPlay.BeginPlay();
             }
             
+            component.root = this;
             component.connectState = WindowComponentBehaviour.ConnectState.Connected;
             connections.Add(component);
             return component;
@@ -92,6 +93,7 @@ namespace TinyServices.Windows {
             
         #endif
             
+            component.root = this;
             component.connectState = WindowComponentBehaviour.ConnectState.Connected;
             connections.Add(component);
             return component;
@@ -116,6 +118,7 @@ namespace TinyServices.Windows {
                     unload.Unload();
                 }
                 
+                connect.root = null;
                 connect.connectState = WindowComponentBehaviour.ConnectState.Disconnected;
                 connect.DisconnectAll();
             }
@@ -138,6 +141,7 @@ namespace TinyServices.Windows {
                 unload.Unload();
             }
             
+            connections[index].root = null;
             connections[index].connectState = WindowComponentBehaviour.ConnectState.Disconnected;
             connections[index].DisconnectAll();
             connections.RemoveAt(index);
