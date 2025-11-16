@@ -14,6 +14,9 @@ namespace TinyServices.Windows {
     public sealed class CanvasWindowsRoot : MonoBehaviour {
         public Canvas canvas => _thisCanvas;
         
+        [field: SerializeField]
+        public bool withWindows { get; private set; }
+        
     #if ODIN_INSPECTOR
         [ValueDropdown("GetAllWindows"), Required]
     #endif
@@ -27,7 +30,7 @@ namespace TinyServices.Windows {
         private Canvas _thisCanvas;
         
         private void Start() {
-            WindowsService.AddRoot(_thisCanvas);
+            WindowsService.AddRoot(_thisCanvas, withWindows);
             StartCoroutine(CreateWindows());
         }
         

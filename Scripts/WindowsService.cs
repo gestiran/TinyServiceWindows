@@ -47,7 +47,7 @@ namespace TinyServices.Windows {
             }
         }
         
-        public static void AddRoot(Canvas canvas) {
+        public static void AddRoot(Canvas canvas, bool withWindows = false) {
             if (root != null) {
                 _cache.Push(root);
             }
@@ -55,8 +55,16 @@ namespace TinyServices.Windows {
             root = canvas;
             _rootTransform = canvas.transform;
             
-            foreach (WindowBehavior window in _visible) {
-                window.transform.SetParent(_rootTransform);
+            if (withWindows) {
+                foreach (WindowBehavior window in _visible) {
+                    if (window.staticCanvas) {
+                        continue;
+                    }
+                    
+                    try {
+                        window.transform.SetParent(_rootTransform);
+                    } catch (MissingReferenceException) { }
+                }
             }
         }
         
@@ -163,7 +171,9 @@ namespace TinyServices.Windows {
             _visible.Sort();
             
             for (int orderId = 0; orderId < _visible.Count; orderId++) {
-                _visible[orderId].transform.SetSiblingIndex(orderId);
+                try {
+                    _visible[orderId].transform.SetSiblingIndex(orderId);
+                } catch (MissingReferenceException) { }
             }
             
             onUpdateVisible.Send();

@@ -10,6 +10,7 @@ namespace TinyServices.Windows {
         public virtual int priority => 0;
         public virtual bool ignoreAutoHide => false;
         public virtual bool ignoreInput => false;
+        public virtual bool staticCanvas => false;
         public bool isVisible { get; private set; }
         
         public virtual void Show() => gameObject.SetActive(true);
