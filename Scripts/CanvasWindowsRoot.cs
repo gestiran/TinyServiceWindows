@@ -27,9 +27,11 @@ namespace TinyServices.Windows {
         private Canvas _thisCanvas;
         
         private void Start() {
-            WindowsService.ChangeRoot(_thisCanvas);
+            WindowsService.AddRoot(_thisCanvas);
             StartCoroutine(CreateWindows());
         }
+        
+        private void OnDestroy() => WindowsService.RemoveRoot(_thisCanvas);
         
         private IEnumerator CreateWindows() {
             yield return new WaitForEndOfFrame();

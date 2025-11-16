@@ -28,6 +28,7 @@ namespace TinyServices.Windows {
         private static readonly Dictionary<Type, WindowBehavior> _instances;
         private static readonly Dictionary<Type, WindowBehavior> _all;
         private static readonly List<WindowBehavior> _visible;
+        private static readonly Stack<Canvas> _cache;
         
         static WindowsService() {
             onShow = new InputListener<WindowBehavior>();
@@ -37,6 +38,7 @@ namespace TinyServices.Windows {
             _instances = new Dictionary<Type, WindowBehavior>();
             _all = new Dictionary<Type, WindowBehavior>();
             _visible = new List<WindowBehavior>();
+            _cache = new Stack<Canvas>();
             
             WindowsDataBase dataBase = WindowsDataBase.LoadFromResources();
             
@@ -45,12 +47,26 @@ namespace TinyServices.Windows {
             }
         }
         
-        public static void ChangeRoot(Canvas canvas) {
+        public static void AddRoot(Canvas canvas) {
+            if (root != null) {
+                _cache.Push(root);
+            }
+            
             root = canvas;
             _rootTransform = canvas.transform;
             
             foreach (WindowBehavior window in _visible) {
                 window.transform.SetParent(_rootTransform);
+            }
+        }
+        
+        public static void RemoveRoot(Canvas canvas) {
+            if (root.Equals(canvas)) {
+                if (_cache.TryPop(out Canvas cache)) {
+                    AddRoot(cache);
+                }
+            } else if (_cache.TryPeek(out Canvas result) && result.Equals(canvas)) {
+                _cache.Pop();
             }
         }
         
