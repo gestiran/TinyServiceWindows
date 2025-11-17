@@ -154,7 +154,7 @@ namespace TinyServices.Windows {
                 }
                 
                 _instances.Add(type, instance);
-            } else {
+            } else if (instance.staticCanvas == false) {
                 instance.transform.SetParent(parent);
             }
             
