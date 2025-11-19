@@ -51,6 +51,9 @@ namespace TinyServices.Windows {
             }
             
             component.Initialize();
+            component.root = this;
+            component.connectState = WindowComponentBehaviour.ConnectState.Connected;
+            connections.Add(component);
             
             if (component is IInit init) {
                 init.Init();
@@ -64,9 +67,6 @@ namespace TinyServices.Windows {
                 beginPlay.BeginPlay();
             }
             
-            component.root = this;
-            component.connectState = WindowComponentBehaviour.ConnectState.Connected;
-            connections.Add(component);
             return component;
         }
         
@@ -78,6 +78,9 @@ namespace TinyServices.Windows {
             }
             
             component.Initialize();
+            component.root = this;
+            component.connectState = WindowComponentBehaviour.ConnectState.Connected;
+            connections.Add(component);
             
         #if TINY_MVC
             
@@ -95,9 +98,6 @@ namespace TinyServices.Windows {
             
         #endif
             
-            component.root = this;
-            component.connectState = WindowComponentBehaviour.ConnectState.Connected;
-            connections.Add(component);
             return component;
         }
         
