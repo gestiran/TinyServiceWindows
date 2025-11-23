@@ -6,7 +6,7 @@
     "email": "lionext.studio@gmail.com",
     "url": "https://github.com/gestiran"
   },
-  "version": "1.0.28",
+  "version": "1.0.29",
   "unity": "2018.4",
   "description": "Windows management system",
   "keywords": [
@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "com.unity.modules.uielements": "1.0.0",
-    "com.ges.tinyreactive": "1.0.2"
+    "com.ges.tinyreactive": "1.0.5"
   },
   "publishConfig": {
     "registry": "https://package.openupm.com"
