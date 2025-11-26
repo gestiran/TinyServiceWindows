@@ -11,7 +11,7 @@ namespace TinyServices.Windows {
         public virtual bool ignoreAutoHide => false;
         public virtual bool ignoreInput => false;
         public virtual bool staticCanvas => false;
-        public bool isVisible { get; private set; }
+        public bool isVisible { get; internal set; }
         
         public virtual void Show() => gameObject.SetActive(true);
         
@@ -31,12 +31,12 @@ namespace TinyServices.Windows {
         
         internal override void Initialize() => connections = new List<WindowComponentBehaviour>();
         
-        internal void ShowInternal() {
+        internal virtual void ShowInternal() {
             isVisible = true;
             Show();
         }
         
-        internal void HideInternal() {
+        internal virtual void HideInternal() {
             isVisible = false;
             Hide();
         }
