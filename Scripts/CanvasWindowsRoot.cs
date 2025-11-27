@@ -1,8 +1,16 @@
 // Copyright (c) 2023 Derek Sliman
 // Licensed under the MIT License. See LICENSE.md for details.
 
-using System.Collections;
 using UnityEngine;
+
+#if TINY_MVC
+using TinyMVC.Loop;
+using TinyMVC.Views;
+using TinyMVC.Views.Generated;
+using TinyReactive;
+#else
+using System.Collections;
+#endif
 
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
@@ -11,7 +19,11 @@ using Sirenix.OdinInspector;
 namespace TinyServices.Windows {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Canvas))]
-    public sealed class CanvasWindowsRoot : MonoBehaviour {
+#if TINY_MVC
+    public sealed class CanvasWindowsRoot : View, IInit, IBeginPlay, IUnload, IGeneratedContext {
+    #else
+        public sealed class CanvasWindowsRoot : MonoBehaviour {
+    #endif
         public Canvas canvas => _thisCanvas;
         
         [field: SerializeField]
@@ -29,17 +41,26 @@ namespace TinyServices.Windows {
         [SerializeField]
         private Canvas _thisCanvas;
         
-        private void Awake() => WindowsService.AddRoot(_thisCanvas, withWindows);
+        public void Init() => WindowsService.AddRoot(_thisCanvas, withWindows);
         
-        private IEnumerator Start() {
-            yield return new WaitForEndOfFrame();
-            
+        public void BeginPlay() {
             foreach (WindowBehavior window in _windows) {
                 WindowsService.Show(window.GetType(), transform, WindowsService.Instantiate);
             }
         }
         
-        private void OnDestroy() => WindowsService.RemoveRoot(_thisCanvas);
+        public void Unload() => WindowsService.RemoveRoot(_thisCanvas);
+        
+    #if !TINY_MVC
+        private void Awake() => Init();
+        
+        private IEnumerator Start() {
+            yield return new WaitForEndOfFrame();
+            BeginPlay();
+        }
+        
+        private void OnDestroy() => Unload();
+    #endif
         
     #if UNITY_EDITOR
         
@@ -60,10 +81,17 @@ namespace TinyServices.Windows {
     #endif
         
         [ContextMenu("Soft Reset")]
+    #if TINY_MVC
+        public override void Reset() {
+            _thisCanvas = GetComponent<Canvas>();
+            base.Reset();
+        }
+    #else
         private void Reset() {
             _thisCanvas = GetComponent<Canvas>();
             UnityEditor.EditorUtility.SetDirty(this);
         }
+    #endif
         
         public override string ToString() => gameObject.name;
         
