@@ -29,7 +29,7 @@ namespace TinyServices.Windows {
         [SerializeField]
         private Canvas _thisCanvas;
         
-        private void Start() {
+        private void Awake() {
             WindowsService.AddRoot(_thisCanvas, withWindows);
             StartCoroutine(CreateWindows());
         }
@@ -67,6 +67,8 @@ namespace TinyServices.Windows {
             _thisCanvas = GetComponent<Canvas>();
             UnityEditor.EditorUtility.SetDirty(this);
         }
+        
+        public override string ToString() => gameObject.name;
         
     #endif
     }
