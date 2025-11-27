@@ -29,20 +29,17 @@ namespace TinyServices.Windows {
         [SerializeField]
         private Canvas _thisCanvas;
         
-        private void Awake() {
-            WindowsService.AddRoot(_thisCanvas, withWindows);
-            StartCoroutine(CreateWindows());
-        }
+        private void Awake() => WindowsService.AddRoot(_thisCanvas, withWindows);
         
-        private void OnDestroy() => WindowsService.RemoveRoot(_thisCanvas);
-        
-        private IEnumerator CreateWindows() {
+        private IEnumerator Start() {
             yield return new WaitForEndOfFrame();
             
             foreach (WindowBehavior window in _windows) {
                 WindowsService.Show(window.GetType(), transform, WindowsService.Instantiate);
             }
         }
+        
+        private void OnDestroy() => WindowsService.RemoveRoot(_thisCanvas);
         
     #if UNITY_EDITOR
         
