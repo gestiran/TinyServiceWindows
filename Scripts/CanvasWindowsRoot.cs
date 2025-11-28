@@ -20,9 +20,9 @@ namespace TinyServices.Windows {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Canvas))]
 #if TINY_MVC
-    public sealed class CanvasWindowsRoot : View, IInit, IBeginPlay, IUnload, IGeneratedContext {
+    public class CanvasWindowsRoot : View, IInit, IBeginPlay, IUnload, IGeneratedContext {
     #else
-        public sealed class CanvasWindowsRoot : MonoBehaviour {
+        public class CanvasWindowsRoot : MonoBehaviour {
     #endif
         public Canvas canvas => _thisCanvas;
         
@@ -41,15 +41,15 @@ namespace TinyServices.Windows {
         [SerializeField]
         private Canvas _thisCanvas;
         
-        public void Init() => WindowsService.AddRoot(_thisCanvas, withWindows);
+        public virtual void Init() => WindowsService.AddRoot(_thisCanvas, withWindows);
         
-        public void BeginPlay() {
+        public virtual void BeginPlay() {
             foreach (WindowBehavior window in _windows) {
                 WindowsService.Show(window.GetType(), transform, WindowsService.Instantiate);
             }
         }
         
-        public void Unload() => WindowsService.RemoveRoot(_thisCanvas);
+        public virtual void Unload() => WindowsService.RemoveRoot(_thisCanvas);
         
     #if !TINY_MVC
         private void Awake() => Init();
@@ -87,7 +87,7 @@ namespace TinyServices.Windows {
             base.Reset();
         }
     #else
-        private void Reset() {
+        public virtual void Reset() {
             _thisCanvas = GetComponent<Canvas>();
             UnityEditor.EditorUtility.SetDirty(this);
         }
