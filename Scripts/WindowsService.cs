@@ -40,11 +40,7 @@ namespace TinyServices.Windows {
             _visible = new List<WindowBehavior>();
             _cache = new Stack<Canvas>();
             
-            WindowsDataBase dataBase = WindowsDataBase.LoadFromResources();
-            
-            foreach (WindowBehavior window in dataBase.all) {
-                _all.TryAdd(window.GetType(), window);
-            }
+            WindowsDataBase.LoadFromResources().Fill(_all);
         }
         
         public static void AddRoot(Canvas canvas, bool withWindows = false) {
