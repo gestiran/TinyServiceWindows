@@ -20,10 +20,10 @@ namespace TinyServices.Windows {
         
     #if UNITY_EDITOR || UNITY_STANDALONE
     #if ODIN_INSPECTOR
-        [field: Searchable, LabelText("PC (Windows, Linux, MacOS)"), Required]
+        [field: Searchable, LabelText("Standalone (Windows, Linux, MacOS)"), Required]
     #endif
         [field: SerializeField]
-        public WindowBehavior[] pc;
+        public WindowBehavior[] standalone;
     #endif
         
     #if UNITY_EDITOR || UNITY_ANDROID || UNITY_IOS
@@ -42,7 +42,7 @@ namespace TinyServices.Windows {
             }
             
         #if UNITY_STANDALONE
-            foreach (WindowBehavior window in pc) {
+            foreach (WindowBehavior window in standalone) {
                 windows.TryAdd(window.GetType(), window);
             }
         #elif UNITY_ANDROID || UNITY_IOS
@@ -66,14 +66,15 @@ namespace TinyServices.Windows {
         public void Validate(SelfValidationResult result) {
         #if UNITY_EDITOR
             
-            Dictionary<Type, WindowBehavior> pcList = new Dictionary<Type, WindowBehavior>(all.Length + pc.Length);
-            Dictionary<Type, WindowBehavior> mobileList = new Dictionary<Type, WindowBehavior>(all.Length + mobile.Length);
+            Dictionary<Type, WindowBehavior> testList = new Dictionary<Type, WindowBehavior>();
             
-            Validate(pcList, all, nameof(all), result);
-            Validate(mobileList, all, nameof(all), result);
+            Validate(testList, all, nameof(all), result);
+            Validate(testList, standalone, nameof(standalone), result);
             
-            Validate(pcList, pc, nameof(pc), result);
-            Validate(mobileList, mobile, nameof(mobile), result);
+            testList.Clear();
+            
+            Validate(testList, all, nameof(all), result);
+            Validate(testList, mobile, nameof(mobile), result);
             
         #endif
         }

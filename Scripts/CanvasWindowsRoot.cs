@@ -35,6 +35,22 @@ namespace TinyServices.Windows {
         [SerializeField]
         private WindowBehavior[] _windows;
         
+    #if UNITY_EDITOR || UNITY_STANDALONE
+    #if ODIN_INSPECTOR
+        [ValueDropdown("GetStandaloneWindows"), Required]
+    #endif
+        [SerializeField]
+        private WindowBehavior[] _windowsStandalone;
+    #endif
+        
+    #if UNITY_EDITOR || UNITY_ANDROID || UNITY_IOS
+    #if ODIN_INSPECTOR
+        [ValueDropdown("GetMobileWindows"), Required]
+    #endif
+        [SerializeField]
+        private WindowBehavior[] _windowsMobile;
+    #endif
+        
     #if ODIN_INSPECTOR
         [BoxGroup("Generated"), Required, ReadOnly]
     #endif
@@ -47,6 +63,16 @@ namespace TinyServices.Windows {
             foreach (WindowBehavior window in _windows) {
                 WindowsService.Show(window.GetType(), transform, WindowsService.Instantiate);
             }
+            
+        #if UNITY_STANDALONE
+            foreach (WindowBehavior window in _windowsStandalone) {
+                WindowsService.Show(window.GetType(), transform, WindowsService.Instantiate);
+            }
+        #elif UNITY_ANDROID || UNITY_IOS
+            foreach (WindowBehavior window in _windowsMobile) {
+                WindowsService.Show(window.GetType(), transform, WindowsService.Instantiate);
+            }
+        #endif
         }
         
         public virtual void Unload() => WindowsService.RemoveRoot(_thisCanvas);
@@ -66,16 +92,20 @@ namespace TinyServices.Windows {
         
     #if ODIN_INSPECTOR
         
-        private ValueDropdownList<WindowBehavior> GetAllWindows() {
-            WindowsDataBase dataBase = WindowsDataBase.LoadFromResources();
+        private ValueDropdownList<WindowBehavior> GetAllWindows() => GetWindows(WindowsDataBase.LoadFromResources().all);
+        
+        private ValueDropdownList<WindowBehavior> GetStandaloneWindows() => GetWindows(WindowsDataBase.LoadFromResources().standalone);
+        
+        private ValueDropdownList<WindowBehavior> GetMobileWindows() => GetWindows(WindowsDataBase.LoadFromResources().mobile);
+        
+        private ValueDropdownList<WindowBehavior> GetWindows(WindowBehavior[] source) {
+            ValueDropdownList<WindowBehavior> result = new ValueDropdownList<WindowBehavior>();
             
-            ValueDropdownList<WindowBehavior> windows = new ValueDropdownList<WindowBehavior>();
-            
-            foreach (WindowBehavior window in dataBase.all) {
-                windows.Add(window.GetType().Name, window);
+            foreach (WindowBehavior window in source) {
+                result.Add(window.GetType().Name, window);
             }
             
-            return windows;
+            return result;
         }
         
     #endif
