@@ -13,3 +13,5 @@ MonoBehaviour:
   m_Name: WindowsDataBase_Default
   m_EditorClassIdentifier: 
   all: []
+  pc: []
+  mobile: []
