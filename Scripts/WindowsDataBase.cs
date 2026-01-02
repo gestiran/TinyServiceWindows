@@ -45,9 +45,7 @@ namespace TinyServices.Windows {
             foreach (WindowBehavior window in pc) {
                 windows.TryAdd(window.GetType(), window);
             }
-        #endif
-            
-        #if UNITY_ANDROID || UNITY_IOS
+        #elif UNITY_ANDROID || UNITY_IOS
             foreach (WindowBehavior window in mobile) {
                 windows.TryAdd(window.GetType(), window);
             }
@@ -68,10 +66,14 @@ namespace TinyServices.Windows {
         public void Validate(SelfValidationResult result) {
         #if UNITY_EDITOR
             
-            Dictionary<Type, WindowBehavior> checkList = new Dictionary<Type, WindowBehavior>(all.Length + pc.Length + mobile.Length);
-            Validate(checkList, all, nameof(all), result);
-            Validate(checkList, pc, nameof(pc), result);
-            Validate(checkList, mobile, nameof(mobile), result);
+            Dictionary<Type, WindowBehavior> pcList = new Dictionary<Type, WindowBehavior>(all.Length + pc.Length);
+            Dictionary<Type, WindowBehavior> mobileList = new Dictionary<Type, WindowBehavior>(all.Length + mobile.Length);
+            
+            Validate(pcList, all, nameof(all), result);
+            Validate(mobileList, all, nameof(all), result);
+            
+            Validate(pcList, pc, nameof(pc), result);
+            Validate(mobileList, mobile, nameof(mobile), result);
             
         #endif
         }
