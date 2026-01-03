@@ -1,6 +1,7 @@
 // Copyright (c) 2023 Derek Sliman
 // Licensed under the MIT License. See LICENSE.md for details.
 
+using System;
 using UnityEngine;
 
 #if TINY_MVC
@@ -30,14 +31,14 @@ namespace TinyServices.Windows {
         public bool withWindows { get; private set; }
         
     #if ODIN_INSPECTOR
-        [ValueDropdown("GetAllWindows"), Required]
+        [ValueDropdown("GetAllWindows"), LabelText("All"), Required]
     #endif
         [SerializeField]
         private WindowBehavior[] _windows;
         
     #if UNITY_EDITOR || UNITY_STANDALONE
     #if ODIN_INSPECTOR
-        [ValueDropdown("GetStandaloneWindows"), Required]
+        [ValueDropdown("GetStandaloneWindows"), LabelText("Standalone (Windows, Linux, MacOS)"), Required]
     #endif
         [SerializeField]
         private WindowBehavior[] _windowsStandalone;
@@ -45,7 +46,7 @@ namespace TinyServices.Windows {
         
     #if UNITY_EDITOR || UNITY_ANDROID || UNITY_IOS
     #if ODIN_INSPECTOR
-        [ValueDropdown("GetMobileWindows"), Required]
+        [ValueDropdown("GetMobileWindows"), LabelText("Mobile (Android, IOS)"), Required]
     #endif
         [SerializeField]
         private WindowBehavior[] _windowsMobile;
@@ -60,22 +61,25 @@ namespace TinyServices.Windows {
         public virtual void Init() => WindowsService.AddRoot(_thisCanvas, withWindows);
         
         public virtual void BeginPlay() {
-            foreach (WindowBehavior window in _windows) {
-                WindowsService.Show(window.GetType(), transform, WindowsService.Instantiate);
-            }
-            
+            CreateWindows(_windows, transform);
         #if UNITY_STANDALONE
-            foreach (WindowBehavior window in _windowsStandalone) {
-                WindowsService.Show(window.GetType(), transform, WindowsService.Instantiate);
-            }
+            CreateWindows(_windowsStandalone, transform);
         #elif UNITY_ANDROID || UNITY_IOS
-            foreach (WindowBehavior window in _windowsMobile) {
-                WindowsService.Show(window.GetType(), transform, WindowsService.Instantiate);
-            }
+            CreateWindows(_windowsMobile, transform);
         #endif
         }
         
         public virtual void Unload() => WindowsService.RemoveRoot(_thisCanvas);
+        
+        private void CreateWindows(WindowBehavior[] windows, Transform parent) {
+            foreach (WindowBehavior window in windows) {
+                try {
+                    WindowsService.Show(window.GetType(), parent, WindowsService.Instantiate);
+                } catch (Exception exception) {
+                    Debug.LogException(exception);
+                }
+            }
+        }
         
     #if !TINY_MVC
         private void Awake() => Init();
@@ -102,7 +106,9 @@ namespace TinyServices.Windows {
             ValueDropdownList<WindowBehavior> result = new ValueDropdownList<WindowBehavior>();
             
             foreach (WindowBehavior window in source) {
-                result.Add(window.GetType().Name, window);
+                if (window != null) {
+                    result.Add(window.GetType().Name, window);   
+                }
             }
             
             return result;
