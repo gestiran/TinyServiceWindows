@@ -31,14 +31,14 @@ namespace TinyServices.Windows {
         public bool withWindows { get; private set; }
         
     #if ODIN_INSPECTOR
-        [ValueDropdown("GetAllWindows"), LabelText("All"), Required]
+        [Searchable, ValueDropdown("GetAllWindows"), LabelText("All Platforms"), Required]
     #endif
         [SerializeField]
         private WindowBehavior[] _windows;
         
     #if UNITY_EDITOR || UNITY_STANDALONE
     #if ODIN_INSPECTOR
-        [ValueDropdown("GetStandaloneWindows"), LabelText("Standalone (Windows, Linux, MacOS)"), Required]
+        [Searchable, ValueDropdown("GetStandaloneWindows"), LabelText("Standalone (Windows, Linux, MacOS)"), Required]
     #endif
         [SerializeField]
         private WindowBehavior[] _windowsStandalone;
@@ -46,7 +46,7 @@ namespace TinyServices.Windows {
         
     #if UNITY_EDITOR || UNITY_ANDROID || UNITY_IOS
     #if ODIN_INSPECTOR
-        [ValueDropdown("GetMobileWindows"), LabelText("Mobile (Android, IOS)"), Required]
+        [Searchable, ValueDropdown("GetMobileWindows"), LabelText("Mobile (Android, IOS)"), Required]
     #endif
         [SerializeField]
         private WindowBehavior[] _windowsMobile;

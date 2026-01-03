@@ -13,7 +13,7 @@ namespace TinyServices.Windows {
     [CreateAssetMenu(fileName = "WindowsDataBase", menuName = "TinyServices/Windows/DataBase")]
     public sealed class WindowsDataBase : ScriptableObject, ISelfValidator {
     #if ODIN_INSPECTOR
-        [field: Searchable, Required]
+        [field: Searchable, LabelText("All Platforms"), Required]
     #endif
         [field: SerializeField]
         public WindowBehavior[] all;
@@ -37,19 +37,22 @@ namespace TinyServices.Windows {
         private const string _PATH = "WindowsDataBase";
         
         public void Fill(Dictionary<Type, WindowBehavior> windows) {
-            foreach (WindowBehavior window in all) {
-                windows.TryAdd(window.GetType(), window);
-            }
-            
+            Fill(all, windows);
         #if UNITY_STANDALONE
-            foreach (WindowBehavior window in standalone) {
-                windows.TryAdd(window.GetType(), window);
-            }
+            Fill(standalone, windows);
         #elif UNITY_ANDROID || UNITY_IOS
-            foreach (WindowBehavior window in mobile) {
-                windows.TryAdd(window.GetType(), window);
-            }
+            Fill(mobile, windows);
         #endif
+        }
+        
+        private void Fill(WindowBehavior[] source, Dictionary<Type, WindowBehavior> destination) {
+            foreach (WindowBehavior window in source) {
+                try {
+                    destination.TryAdd(window.GetType(), window);
+                } catch (Exception exception) {
+                    Debug.LogException(exception);
+                }
+            }
         }
         
         public static WindowsDataBase LoadFromResources() {
