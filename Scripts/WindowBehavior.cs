@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using TinyReactive;
+using UnityEngine;
 
 namespace TinyServices.Windows {
     public abstract class WindowBehavior : WindowContext, IComparable<WindowBehavior> {
@@ -19,7 +20,11 @@ namespace TinyServices.Windows {
         
         private void OnDestroy() {
             if (this is IUnload unload) {
-                unload.Unload();
+                try {
+                    unload.Unload();
+                } catch (Exception exception) {
+                    Debug.LogException(new Exception($"Invalid Unload operation - {GetType().Name}", exception));
+                }
             }
             
             DisconnectAll();
@@ -33,12 +38,22 @@ namespace TinyServices.Windows {
         
         internal virtual void ShowInternal() {
             isVisible = true;
-            Show();
+            
+            try {
+                Show();
+            } catch (Exception exception) {
+                Debug.LogException(new Exception($"Invalid Show operation - {GetType().Name}", exception));
+            }
         }
         
         internal virtual void HideInternal() {
             isVisible = false;
-            Hide();
+            
+            try {
+                Hide();
+            } catch (Exception exception) {
+                Debug.LogException(new Exception($"Invalid Hide operation - {GetType().Name}", exception));
+            }
         }
         
         public int CompareTo(WindowBehavior other) => priority - other.priority;

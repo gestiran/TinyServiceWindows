@@ -25,8 +25,8 @@ namespace TinyServices.Windows {
         public static readonly InputListener<WindowBehavior> onHide;
         public static readonly InputListener onUpdateVisible;
         
+        private static readonly Dictionary<Type, WindowBehavior> _prefabs;
         private static readonly Dictionary<Type, WindowBehavior> _instances;
-        private static readonly Dictionary<Type, WindowBehavior> _all;
         private static readonly List<WindowBehavior> _visible;
         private static readonly Stack<Canvas> _cache;
         
@@ -35,12 +35,12 @@ namespace TinyServices.Windows {
             onHide = new InputListener<WindowBehavior>();
             onUpdateVisible = new InputListener();
             
+            _prefabs = new Dictionary<Type, WindowBehavior>();
             _instances = new Dictionary<Type, WindowBehavior>();
-            _all = new Dictionary<Type, WindowBehavior>();
             _visible = new List<WindowBehavior>();
             _cache = new Stack<Canvas>();
             
-            WindowsDataBase.LoadFromResources().Fill(_all);
+            WindowsDataBase.LoadFromResources().Fill(_prefabs);
         }
         
         public static void AddRoot(Canvas canvas, bool withWindows = false) {
@@ -142,8 +142,8 @@ namespace TinyServices.Windows {
             bool isInitialized = false;
             
             if (_instances.TryGetValue(type, out WindowBehavior instance) == false) {
-                if (_all.TryGetValue(type, out WindowBehavior window)) {
-                    instance = instantiate(window, parent);
+                if (_prefabs.TryGetValue(type, out WindowBehavior prefab)) {
+                    instance = instantiate(prefab, parent);
                     isInitialized = true;
                 } else {
                     return null;
@@ -156,7 +156,11 @@ namespace TinyServices.Windows {
             
         #if TINY_MVC
             if (isInitialized == false && instance is IUpdateConnection updateConnection) {
-                updateConnection.UpdateConnection();
+                try {
+                    updateConnection.UpdateConnection();
+                } catch (Exception exception) {
+                    Debug.LogException(new Exception($"Invalid UpdateConnection operation - {instance.GetType().Name}", exception));
+                }
             }
         #endif
             
@@ -260,15 +264,28 @@ namespace TinyServices.Windows {
         #if TINY_MVC
             
             if (instance is IInit init) {
-                init.Init();
+                try {
+                    init.Init();
+                } catch (Exception exception) {
+                    Debug.LogException(new Exception($"Invalid Init operation - {instance.GetType().Name}", exception));
+                }
             }
             
             if (instance is IApplyResolving applyResolving) {
-                applyResolving.ApplyResolving();
+                try {
+                    applyResolving.ApplyResolving();
+                } catch (Exception exception) {
+                    Debug.LogException(new Exception($"Invalid ApplyResolving operation - {instance.GetType().Name}", exception));
+                }
             }
             
             if (instance is IBeginPlay beginPlay) {
-                beginPlay.BeginPlay();
+                try {
+                    beginPlay.BeginPlay();
+                } catch (Exception exception) {
+                    Debug.LogException(new Exception($"Invalid BeginPlay operation - {instance.GetType().Name}", exception));
+                }
+                
             }
             
         #endif
