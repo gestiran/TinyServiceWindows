@@ -14,7 +14,6 @@ using TinyMVC.Views;
 #endif
 
 namespace TinyServices.Windows {
-    [DisallowMultipleComponent]
     public abstract class WindowContext : MonoBehaviour {
         internal List<WindowComponentBehaviour> connections;
         

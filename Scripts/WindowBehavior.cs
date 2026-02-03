@@ -7,6 +7,7 @@ using TinyReactive;
 using UnityEngine;
 
 namespace TinyServices.Windows {
+    [DisallowMultipleComponent]
     public abstract class WindowBehavior : WindowContext, IComparable<WindowBehavior> {
         public virtual int priority => 0;
         public virtual bool ignoreAutoHide => false;
