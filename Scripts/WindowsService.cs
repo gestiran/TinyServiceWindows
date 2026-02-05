@@ -84,6 +84,16 @@ namespace TinyServices.Windows {
             return false;
         }
         
+        public static bool IsVisibleAnyPaused() {
+            for (int windowId = 0; windowId < _visible.Count; windowId++) {
+                if (_visible[windowId].isRuntime == false) {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+        
         public static IEnumerable<WindowBehavior> ForeachVisible() {
             for (int windowId = 0; windowId < _visible.Count; windowId++) {
                 yield return _visible[windowId];
