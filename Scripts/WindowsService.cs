@@ -74,9 +74,19 @@ namespace TinyServices.Windows {
             }
         }
         
+        public static bool IsVisibleAnyRuntime() {
+            for (int windowId = 0; windowId < _visible.Count; windowId++) {
+                if (_visible[windowId].isRuntime) {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+        
         public static IEnumerable<WindowBehavior> ForeachVisible() {
-            foreach (WindowBehavior window in _visible) {
-                yield return window;
+            for (int windowId = 0; windowId < _visible.Count; windowId++) {
+                yield return _visible[windowId];
             }
         }
         

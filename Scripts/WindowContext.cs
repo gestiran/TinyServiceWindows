@@ -17,14 +17,6 @@ namespace TinyServices.Windows {
     public abstract class WindowContext : MonoBehaviour {
         internal List<WindowComponentBehaviour> connections;
         
-        private void Awake() { }
-        
-        private void Start() { }
-        
-        private void OnEnable() { }
-        
-        private void OnDisable() { }
-        
         protected IEnumerable<WindowComponentBehaviour> ForEachConnections() => connections;
         
         [Obsolete("Can`t use without parameters", true)]
