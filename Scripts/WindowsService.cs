@@ -25,8 +25,8 @@ namespace TinyServices.Windows {
         public static readonly InputListener<WindowBehavior> onHide;
         public static readonly InputListener onUpdateVisible;
         
-        private static readonly Dictionary<Type, WindowBehavior> _prefabs;
-        private static readonly Dictionary<Type, WindowBehavior> _instances;
+        private static readonly Dictionary<string, WindowBehavior> _prefabs;
+        private static readonly Dictionary<string, WindowBehavior> _instances;
         private static readonly List<WindowBehavior> _visible;
         private static readonly Stack<Canvas> _cache;
         
@@ -35,8 +35,8 @@ namespace TinyServices.Windows {
             onHide = new InputListener<WindowBehavior>();
             onUpdateVisible = new InputListener();
             
-            _prefabs = new Dictionary<Type, WindowBehavior>();
-            _instances = new Dictionary<Type, WindowBehavior>();
+            _prefabs = new Dictionary<string, WindowBehavior>();
+            _instances = new Dictionary<string, WindowBehavior>();
             _visible = new List<WindowBehavior>();
             _cache = new Stack<Canvas>();
             
@@ -139,37 +139,55 @@ namespace TinyServices.Windows {
     #if TINY_MVC
         
         public static T Show<T>(params IDependency[] dependencies) where T : WindowBehavior {
-            return Show(typeof(T), _rootTransform, (window, transform) => Instantiate(window, transform, dependencies)) as T;
+            return Show(DefaultKey<T>(), _rootTransform, (window, transform) => Instantiate(window, transform, dependencies)) as T;
         }
         
         public static T Show<T>(Canvas canvas, params IDependency[] dependencies) where T : WindowBehavior {
-            return Show(typeof(T), canvas.transform, (window, transform) => Instantiate(window, transform, dependencies)) as T;
+            return Show(DefaultKey<T>(), canvas.transform, (window, transform) => Instantiate(window, transform, dependencies)) as T;
         }
         
         public static T Show<T>(Transform parent, params IDependency[] dependencies) where T : WindowBehavior {
-            return Show(typeof(T), parent, (window, transform) => Instantiate(window, transform, dependencies)) as T;
+            return Show(DefaultKey<T>(), parent, (window, transform) => Instantiate(window, transform, dependencies)) as T;
+        }
+        
+        public static T Show<T>(string key, params IDependency[] dependencies) where T : WindowBehavior {
+            return Show(key, _rootTransform, (window, transform) => Instantiate(window, transform, dependencies)) as T;
+        }
+        
+        public static T Show<T>(string key, Canvas canvas, params IDependency[] dependencies) where T : WindowBehavior {
+            return Show(key, canvas.transform, (window, transform) => Instantiate(window, transform, dependencies)) as T;
+        }
+        
+        public static T Show<T>(string key, Transform parent, params IDependency[] dependencies) where T : WindowBehavior {
+            return Show(key, parent, (window, transform) => Instantiate(window, transform, dependencies)) as T;
         }
         
     #endif
         
-        public static T Show<T>() where T : WindowBehavior => Show(typeof(T), _rootTransform, Instantiate) as T;
+        public static T Show<T>() where T : WindowBehavior => Show(DefaultKey<T>(), _rootTransform, Instantiate) as T;
         
-        public static T Show<T>(Canvas canvas) where T : WindowBehavior => Show(typeof(T), canvas.transform, Instantiate) as T;
+        public static T Show<T>(Canvas canvas) where T : WindowBehavior => Show(DefaultKey<T>(), canvas.transform, Instantiate) as T;
         
-        public static T Show<T>(Transform parent) where T : WindowBehavior => Show(typeof(T), parent, Instantiate) as T;
+        public static T Show<T>(Transform parent) where T : WindowBehavior => Show(DefaultKey<T>(), parent, Instantiate) as T;
         
-        internal static WindowBehavior Show(Type type, Transform parent, Func<WindowBehavior, Transform, WindowBehavior> instantiate) {
+        public static T Show<T>(string key) where T : WindowBehavior => Show(key, _rootTransform, Instantiate) as T;
+        
+        public static T Show<T>(string key, Canvas canvas) where T : WindowBehavior => Show(key, canvas.transform, Instantiate) as T;
+        
+        public static T Show<T>(string key, Transform parent) where T : WindowBehavior => Show(key, parent, Instantiate) as T;
+        
+        internal static WindowBehavior Show(string key, Transform parent, Func<WindowBehavior, Transform, WindowBehavior> instantiate) {
             bool isInitialized = false;
             
-            if (_instances.TryGetValue(type, out WindowBehavior instance) == false) {
-                if (_prefabs.TryGetValue(type, out WindowBehavior prefab)) {
+            if (_instances.TryGetValue(key, out WindowBehavior instance) == false) {
+                if (_prefabs.TryGetValue(key, out WindowBehavior prefab)) {
                     instance = instantiate(prefab, parent);
                     isInitialized = true;
                 } else {
                     return null;
                 }
                 
-                _instances.Add(type, instance);
+                _instances.Add(key, instance);
             } else if (instance.staticCanvas == false) {
                 instance.transform.SetParent(parent);
             }
@@ -202,9 +220,13 @@ namespace TinyServices.Windows {
         
         public static bool Hide<T>() where T : WindowBehavior => Hide<T>(out _);
         
-        public static bool Hide<T>(out T window) where T : WindowBehavior {
+        public static bool Hide<T>(string key) where T : WindowBehavior => Hide<T>(key, out _);
+        
+        public static bool Hide<T>(out T window) where T : WindowBehavior => Hide<T>(DefaultKey<T>(), out window);
+        
+        public static bool Hide<T>(string key, out T window) where T : WindowBehavior {
             for (int windowId = _visible.Count - 1; windowId >= 0; windowId--) {
-                if (_visible[windowId] is T target) {
+                if (_visible[windowId] is T target && target.GetKey() == key) {
                     window = target;
                     
                     _visible.RemoveAt(windowId);
@@ -251,7 +273,7 @@ namespace TinyServices.Windows {
         }
         
         internal static void DestroyWindow(WindowBehavior window) {
-            _instances.Remove(window.GetType());
+            _instances.Remove(window.GetKey());
             _visible.Remove(window);
             onUpdateVisible.Send();
         }
@@ -312,5 +334,9 @@ namespace TinyServices.Windows {
             
             return instance;
         }
+        
+        internal static string DefaultKey<T>() where T : WindowBehavior => typeof(T).FullName;
+        
+        internal static string DefaultKey<T>(T window) where T : WindowBehavior => window.GetType().FullName;
     }
 }

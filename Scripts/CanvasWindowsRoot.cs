@@ -74,7 +74,7 @@ namespace TinyServices.Windows {
         private void CreateWindows(WindowBehavior[] windows, Transform parent) {
             foreach (WindowBehavior window in windows) {
                 try {
-                    WindowsService.Show(window.GetType(), parent, WindowsService.Instantiate);
+                    WindowsService.Show(window.GetKey(), parent, WindowsService.Instantiate);
                 } catch (Exception exception) {
                     Debug.LogException(exception);
                 }

@@ -36,7 +36,7 @@ namespace TinyServices.Windows {
         
         private const string _PATH = "WindowsDataBase";
         
-        public void Fill(Dictionary<Type, WindowBehavior> windows) {
+        public void Fill(Dictionary<string, WindowBehavior> windows) {
             Fill(all, windows);
         #if UNITY_STANDALONE
             Fill(standalone, windows);
@@ -45,10 +45,10 @@ namespace TinyServices.Windows {
         #endif
         }
         
-        private void Fill(WindowBehavior[] source, Dictionary<Type, WindowBehavior> destination) {
+        private void Fill(WindowBehavior[] source, Dictionary<string, WindowBehavior> destination) {
             foreach (WindowBehavior window in source) {
                 try {
-                    destination.TryAdd(window.GetType(), window);
+                    destination.TryAdd(window.GetKey(), window);
                 } catch (Exception exception) {
                     Debug.LogException(exception);
                 }
@@ -69,7 +69,7 @@ namespace TinyServices.Windows {
         public void Validate(SelfValidationResult result) {
         #if UNITY_EDITOR
             
-            Dictionary<Type, WindowBehavior> testList = new Dictionary<Type, WindowBehavior>();
+            Dictionary<string, WindowBehavior> testList = new Dictionary<string, WindowBehavior>();
             
             Validate(testList, all, nameof(all), result);
             Validate(testList, standalone, nameof(standalone), result);
@@ -84,19 +84,19 @@ namespace TinyServices.Windows {
         
     #if UNITY_EDITOR
         
-        private void Validate(Dictionary<Type, WindowBehavior> checkList, WindowBehavior[] windows, string group, SelfValidationResult result) {
+        private void Validate(Dictionary<string, WindowBehavior> checkList, WindowBehavior[] windows, string group, SelfValidationResult result) {
             foreach (WindowBehavior window in windows) {
                 if (window == null) {
                     continue;
                 }
                 
-                Type windowType = window.GetType();
+                string windowKey = window.GetKey();
                 
-                if (checkList.TryAdd(windowType, window)) {
+                if (checkList.TryAdd(windowKey, window)) {
                     continue;
                 }
                 
-                result.AddError($"Invalid window type {windowType.Name} in group {group}!");
+                result.AddError($"Invalid window key {windowKey} in group {group}!");
             }
         }
         

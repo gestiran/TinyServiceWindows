@@ -59,5 +59,7 @@ namespace TinyServices.Windows {
         }
         
         public int CompareTo(WindowBehavior other) => priority - other.priority;
+        
+        public virtual string GetKey() => WindowsService.DefaultKey(this);
     }
 }
