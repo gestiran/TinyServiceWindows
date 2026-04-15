@@ -148,6 +148,17 @@ namespace TinyServices.Windows {
             return false;
         }
         
+        public static bool Destroy<T>() where T : WindowBehavior {
+            foreach (WindowBehavior other in _instances.Values) {
+                if (other is T target) {
+                    DestroyWindow(target);
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+        
     #if TINY_MVC
         
         public static T Show<T>(params IDependency[] dependencies) where T : WindowBehavior {
@@ -286,8 +297,10 @@ namespace TinyServices.Windows {
         
         internal static void DestroyWindow(WindowBehavior window) {
             _instances.Remove(window.GetKey());
-            _visible.Remove(window);
-            onUpdateVisible.Send();
+            
+            if (_visible.Remove(window)) {
+                onUpdateVisible.Send();    
+            }
         }
         
     #if TINY_MVC
