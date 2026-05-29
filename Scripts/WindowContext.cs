@@ -100,7 +100,7 @@ namespace TinyServices.Windows {
             }
         }
         
-        protected void DisconnectAll() {
+        internal void DisconnectAll() {
             foreach (WindowComponentBehaviour connect in connections) {
                 if (connect.connectState != WindowComponentBehaviour.ConnectState.Connected) {
                     continue;

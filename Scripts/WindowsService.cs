@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using TinyReactive;
 using TinyReactive.Fields;
 using UnityEngine;
 using UnityObject = UnityEngine.Object;
@@ -151,6 +152,12 @@ namespace TinyServices.Windows {
         public static bool Destroy<T>() where T : WindowBehavior {
             foreach (WindowBehavior other in _instances.Values) {
                 if (other is T target) {
+                    target.DisconnectAll();
+                    
+                    if (target is IUnload unload) {
+                        unload.Unload();
+                    }
+                    
                     DestroyWindow(target);
                     return true;
                 }
@@ -292,6 +299,18 @@ namespace TinyServices.Windows {
             }
             
             _visible.Clear();
+            onUpdateVisible.Send();
+        }
+        
+        public static void HideAll<T>() where T : WindowBehavior {
+            for (int windowId = _visible.Count - 1; windowId >= 0; windowId--) {
+                if (_visible[windowId] is T target) {
+                    target.Hide();
+                    onHide.Send(target);
+                    _visible.RemoveAt(windowId);
+                }
+            }
+            
             onUpdateVisible.Send();
         }
         
