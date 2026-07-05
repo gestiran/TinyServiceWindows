@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "com.unity.modules.uielements": "1.0.0",
-    "com.ges.tinyreactive": "1.2.8"
+    "com.ges.tinyreactive": "1.3.4"
   },
   "publishConfig": {
     "registry": "https://package.openupm.com"

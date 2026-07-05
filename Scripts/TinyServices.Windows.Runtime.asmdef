@@ -2,7 +2,6 @@
     "name": "TinyServices.Windows.Runtime",
     "rootNamespace": "TinyServices.Windows",
     "references": [
-        "GUID:52e8ae13a5f06b247affb7808bc8d3ff",
         "GUID:1d8cf7cb5006f57428fd819399459569"
     ],
     "includePlatforms": [],
@@ -10,6 +9,7 @@
     "allowUnsafeCode": true,
     "overrideReferences": true,
     "precompiledReferences": [
+        "com.ges.tinyreactive.dll",
         "Sirenix.OdinInspector.Attributes.dll"
     ],
     "autoReferenced": true,
@@ -17,7 +17,7 @@
     "versionDefines": [
         {
             "name": "com.ges.tinymvc",
-            "expression": "1.13.12",
+            "expression": "1.17.6",
             "define": "TINY_MVC"
         }
     ],
