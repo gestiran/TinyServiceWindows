@@ -2,7 +2,6 @@
 // Licensed under the MIT License. See LICENSE.md for details.
 
 using System;
-using System.Collections.Generic;
 using TinyReactive;
 using UnityEngine;
 
@@ -21,22 +20,23 @@ namespace TinyServices.Windows {
         public virtual void Hide() => gameObject.SetActive(false);
         
         private void OnDestroy() {
-            if (this is IUnload unload) {
-                try {
-                    unload.Unload();
-                } catch (Exception exception) {
-                    Debug.LogException(new Exception($"Invalid Unload operation - {GetType().Name}", exception));
+            if (connectState == ConnectState.Connected) {
+                if (this is IUnload unload) {
+                    try {
+                        unload.Unload();
+                    } catch (Exception exception) {
+                        Debug.LogException(new Exception($"Invalid Unload operation - {GetType().Name}", exception));
+                    }
                 }
+                
+                DisconnectAll();
+                WindowsService.DestroyWindow(this);
+                connectState = ConnectState.Disconnected;
             }
-            
-            DisconnectAll();
-            WindowsService.DestroyWindow(this);
         }
         
         [Obsolete("Can`t use without parameters", true)]
         protected void Disconnect() { }
-        
-        internal override void Initialize() => connections = new List<WindowComponentBehaviour>();
         
         internal virtual void ShowInternal() {
             isVisible = true;

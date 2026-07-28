@@ -16,6 +16,13 @@ using TinyMVC.Views;
 namespace TinyServices.Windows {
     public abstract class WindowContext : MonoBehaviour {
         internal List<WindowComponentBehaviour> connections;
+        internal ConnectState connectState;
+        
+        internal enum ConnectState {
+            None,
+            Disconnected,
+            Connected
+        }
         
         protected IEnumerable<WindowComponentBehaviour> ForEachConnections() => connections;
         
@@ -37,13 +44,13 @@ namespace TinyServices.Windows {
         }
         
         protected T Connect<T>(T component, params IDependency[] dependencies) where T : WindowComponentBehaviour {
-            if (component.connectState == WindowComponentBehaviour.ConnectState.Connected) {
+            if (component.connectState == ConnectState.Connected) {
                 return component;
             }
             
             component.Initialize();
             component.root = this;
-            component.connectState = WindowComponentBehaviour.ConnectState.Connected;
+            component.connectState = ConnectState.Connected;
             connections.Add(component);
             
             if (component is IInit init) {
@@ -64,13 +71,13 @@ namespace TinyServices.Windows {
     #endif
         
         protected T Connect<T>(T component) where T : WindowComponentBehaviour {
-            if (component.connectState == WindowComponentBehaviour.ConnectState.Connected) {
+            if (component.connectState == ConnectState.Connected) {
                 return component;
             }
             
             component.Initialize();
             component.root = this;
-            component.connectState = WindowComponentBehaviour.ConnectState.Connected;
+            component.connectState = ConnectState.Connected;
             connections.Add(component);
             
         #if TINY_MVC
@@ -102,7 +109,7 @@ namespace TinyServices.Windows {
         
         internal void DisconnectAll() {
             foreach (WindowComponentBehaviour connect in connections) {
-                if (connect.connectState != WindowComponentBehaviour.ConnectState.Connected) {
+                if (connect.connectState != ConnectState.Connected) {
                     continue;
                 }
                 
@@ -111,7 +118,7 @@ namespace TinyServices.Windows {
                 }
                 
                 connect.root = null;
-                connect.connectState = WindowComponentBehaviour.ConnectState.Disconnected;
+                connect.connectState = ConnectState.Disconnected;
                 connect.DisconnectAll();
             }
             
@@ -119,7 +126,7 @@ namespace TinyServices.Windows {
         }
         
         protected bool Disconnect(WindowComponentBehaviour component) {
-            if (component.connectState == WindowComponentBehaviour.ConnectState.Disconnected) {
+            if (component.connectState == ConnectState.Disconnected) {
                 return false;
             }
             
@@ -134,7 +141,7 @@ namespace TinyServices.Windows {
             }
             
             connections[index].root = null;
-            connections[index].connectState = WindowComponentBehaviour.ConnectState.Disconnected;
+            connections[index].connectState = ConnectState.Disconnected;
             connections[index].DisconnectAll();
             connections.RemoveAt(index);
             return true;
@@ -169,7 +176,7 @@ namespace TinyServices.Windows {
         
         public void Reconnect(params WindowComponentBehaviour[] components) {
             foreach (WindowComponentBehaviour component in components) {
-                if (component.connectState == WindowComponentBehaviour.ConnectState.Connected) {
+                if (component.connectState == ConnectState.Connected) {
                     Disconnect(component);
                 }
                 
@@ -183,7 +190,7 @@ namespace TinyServices.Windows {
         public T Reconnect<T>(T component) where T : WindowComponentBehaviour, IApplyResolving => component;
         
         public T Reconnect<T>(T component, params IDependency[] dependencies) where T : WindowComponentBehaviour, IApplyResolving {
-            if (component.connectState == WindowComponentBehaviour.ConnectState.Connected) {
+            if (component.connectState == ConnectState.Connected) {
                 Disconnect(component);
             }
             
@@ -192,7 +199,9 @@ namespace TinyServices.Windows {
         
     #endif
         
-        internal abstract void Initialize();
+        internal void Initialize() {
+            connections = new List<WindowComponentBehaviour>();
+        }
         
     #if UNITY_EDITOR
         

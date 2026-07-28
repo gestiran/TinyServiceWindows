@@ -339,6 +339,7 @@ namespace TinyServices.Windows {
                 beginPlay.BeginPlay();
             }
             
+            instance.connectState = WindowContext.ConnectState.Connected;
             return instance;
         }
     #endif
@@ -376,6 +377,7 @@ namespace TinyServices.Windows {
             
         #endif
             
+            instance.connectState = WindowContext.ConnectState.Connected;
             return instance;
         }
         
