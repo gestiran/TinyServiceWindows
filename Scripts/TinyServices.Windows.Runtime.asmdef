@@ -2,14 +2,14 @@
     "name": "TinyServices.Windows.Runtime",
     "rootNamespace": "TinyServices.Windows",
     "references": [
-        "GUID:1d8cf7cb5006f57428fd819399459569"
+        "TinyReactive.Core",
+        "TinyMVC.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": true,
     "overrideReferences": true,
     "precompiledReferences": [
-        "com.ges.tinyreactive.dll",
         "Sirenix.OdinInspector.Attributes.dll"
     ],
     "autoReferenced": true,
