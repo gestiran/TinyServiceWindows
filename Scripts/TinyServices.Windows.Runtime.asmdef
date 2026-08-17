@@ -3,6 +3,7 @@
     "rootNamespace": "TinyServices.Windows",
     "references": [
         "TinyReactive.Core",
+        "TinyMVC.Core",
         "TinyMVC.Runtime"
     ],
     "includePlatforms": [],
